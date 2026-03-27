@@ -1,170 +1,94 @@
-# 📝 Real-time Notes App
+# Real-time Notes App
 
-A real-time collaborative notes application built with the **MERN stack** (MongoDB, Express, React, Node.js) and **Socket.IO**. Multiple browser tabs or users on the same network see notes appear and disappear live without refreshing.
+MERN stack notes app with Socket.IO for real-time sync across multiple clients. Add a note in one tab, it shows up in every other tab instantly. Delete it, gone everywhere.
 
----
+## Stack
 
-## 🎯 Features
+- **Backend:** Node.js, Express, MongoDB (Mongoose), Socket.IO
+- **Frontend:** React (Vite), Axios, socket.io-client
+- **Styling:** Vanilla CSS, dark theme
 
-| Feature | Description |
-|---|---|
-| **Create Notes** | Add notes with title and content |
-| **Delete Notes** | Remove notes with a single click |
-| **Real-time Sync** | Socket.IO broadcasts changes to all connected clients instantly |
-| **Search** | Filter notes by title/content with 500ms debounce and MongoDB regex |
-| **Validation** | Client-side and server-side validation for empty fields |
-| **Timestamps** | Each note displays its creation timestamp |
-| **Loading & Error States** | Visual feedback during API calls and on failures |
+## How it works
 
----
+- REST API handles CRUD (`POST /notes`, `GET /notes`, `DELETE /notes/:id`)
+- Socket.IO sits on top of the same HTTP server and broadcasts `noteAdded` / `noteDeleted` events to all connected clients
+- React hooks (`useSocket`, `useNotes`) manage state and socket subscriptions
+- Search uses MongoDB regex with a 500ms debounce on the client side
+- Validation runs on both client (NoteForm) and server (POST route)
 
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Frontend | React 19, Vite, Axios |
-| Backend | Node.js, Express |
-| Database | MongoDB, Mongoose |
-| Real-time | Socket.IO |
-| Styling | Vanilla CSS (dark glassmorphism theme) |
-
----
-
-## 📁 Project Structure
+## Project structure
 
 ```
-notes-app-real-time/
-├── server/
-│   ├── models/
-│   │   └── note.js              # Mongoose schema (title, content, createdAt)
-│   ├── routes/
-│   │   └── notes.js             # POST / GET / DELETE routes (takes io as param)
-│   ├── index.js                 # Express + HTTP server + Socket.IO + Mongoose
-│   ├── .env                     # PORT, MONGO_URI
-│   └── package.json
-├── client/
-│   ├── src/
-│   │   ├── api/
-│   │   │   └── notes.js         # Axios instance + API functions
-│   │   ├── hooks/
-│   │   │   ├── useSocket.js     # Singleton socket + event subscription hook
-│   │   │   └── useNotes.js      # All notes state, logic, socket listeners
-│   │   ├── components/
-│   │   │   ├── NoteForm.jsx     # Controlled inputs + validation
-│   │   │   ├── SearchBar.jsx    # Search input
-│   │   │   └── NoteCard.jsx     # Note display + delete + timestamp
-│   │   ├── App.jsx              # Root component
-│   │   ├── main.jsx             # Entry point
-│   │   └── index.css            # Premium dark theme CSS
-│   ├── index.html
-│   ├── vite.config.js
-│   └── package.json
-├── run.sh                       # One-command startup (Linux/macOS)
-├── run.ps1                      # One-command startup (Windows PowerShell)
-├── .gitignore
-└── README.md
+server/
+  models/note.js        Mongoose schema
+  routes/notes.js       REST routes, takes io as param
+  index.js              Entry point
+  .env                  Config
+
+client/src/
+  api/notes.js          Axios instance
+  hooks/useSocket.js    Socket singleton + event hook
+  hooks/useNotes.js     State management + socket listeners
+  components/
+    NoteForm.jsx        Form with validation
+    SearchBar.jsx       Search input
+    NoteCard.jsx        Card display
+  App.jsx               Root component
+  index.css             Styles
 ```
 
----
+## Setup
 
-## 🚀 Quick Start
+**Prerequisites:** Node.js v18+, MongoDB running on localhost:27017
 
-### Prerequisites
+### Quick start (Linux/macOS)
 
-- [Node.js](https://nodejs.org/) (v18+)
-- [MongoDB](https://www.mongodb.com/) running locally on port `27017`
-
-### Option 1: Run Script (Recommended)
-
-**Linux / macOS:**
 ```bash
 chmod +x run.sh
 ./run.sh
 ```
 
-**Windows (PowerShell):**
+### Quick start (Windows)
+
 ```powershell
 .\run.ps1
 ```
 
-The script will:
-1. Install dependencies for both server and client
-2. Start the backend on `http://localhost:5000`
-3. Start the frontend on `http://localhost:5173`
-
-### Option 2: Manual Setup
+### Manual
 
 ```bash
-# Terminal 1 — Backend
+# backend
 cd server
 npm install
 npm run dev
 
-# Terminal 2 — Frontend
+# frontend (separate terminal)
 cd client
 npm install
 npm run dev
 ```
 
-### Open the App
+Open http://localhost:5173. Try it in two tabs side by side.
 
-Navigate to **http://localhost:5173** in your browser. Open multiple tabs to see real-time sync in action.
+## API
 
----
+```
+POST   /notes              { title, content } -> 201
+GET    /notes              -> all notes, newest first
+GET    /notes?search=term  -> filtered by title/content (regex, case-insensitive)
+DELETE /notes/:id          -> 200
+```
 
-## 📡 API Endpoints
+Socket events: `noteAdded` (full note object), `noteDeleted` (note id string).
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/notes` | Create a new note `{ title, content }` |
-| `GET` | `/notes` | Fetch all notes (sorted by newest first) |
-| `GET` | `/notes?search=keyword` | Search notes by title/content (regex, case-insensitive) |
-| `DELETE` | `/notes/:id` | Delete a note by ID |
+## Environment
 
-### Socket.IO Events
-
-| Event | Direction | Payload |
-|---|---|---|
-| `noteAdded` | Server → Client | Full note object |
-| `noteDeleted` | Server → Client | Note ID (string) |
-
----
-
-## 🏗️ Architecture Decisions
-
-| Decision | Why |
-|---|---|
-| `http.createServer(app)` instead of `app.listen` | Required for Socket.IO to attach to the same HTTP server |
-| Routes accept `io` as a parameter | Avoids circular dependency issues as the project grows |
-| `useRef` for socket event handlers | Prevents stale closures without re-registering socket listeners every render |
-| Inline `setTimeout/clearTimeout` debounce | 3 lines of code — no reason to pull in lodash for this |
-| Validation on both client and server | Defense-in-depth; client for UX, server for data integrity |
-| Singleton socket in `useSocket.js` | One connection shared across all components, not one per hook call |
-
----
-
-## 🔧 Environment Variables
-
-Create `server/.env`:
-
-```env
+`server/.env`:
+```
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/notesapp
 ```
 
----
-
-## 📌 What's Deliberately Left Out
-
-These are intentionally excluded to keep scope tight:
-
-- **Authentication** — Would add JWT middleware on routes + socket handshake auth
-- **Edit functionality** — Would need PUT route + editable card state
-- **Pagination** — GET route is already structured to extend with skip/limit
-- **Error boundaries** — Would add in production for graceful error handling
-
----
-
-## 📄 License
+## License
 
 MIT

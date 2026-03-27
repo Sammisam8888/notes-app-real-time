@@ -53,8 +53,6 @@ h1 {
   background-clip: text;
 }
 
-/* ── Note Form ───────────────────────────────────────────── */
-
 .note-form {
   display: flex;
   flex-direction: column;
@@ -133,8 +131,6 @@ h1 {
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
-/* ── Search Bar ──────────────────────────────────────────── */
-
 .search-bar {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -163,15 +159,11 @@ h1 {
   box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
-/* ── Notes Grid ──────────────────────────────────────────── */
-
 .notes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1rem;
 }
-
-/* ── Note Card ───────────────────────────────────────────── */
 
 .note-card {
   background: var(--bg-card);
@@ -250,8 +242,6 @@ h1 {
   letter-spacing: 0.02em;
 }
 
-/* ── Status Messages ─────────────────────────────────────── */
-
 .error {
   color: var(--danger);
   font-size: 0.85rem;
@@ -277,8 +267,6 @@ h1 {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
-
-/* ── Responsive ──────────────────────────────────────────── */
 
 @media (max-width: 600px) {
   body { padding: 1rem 0.75rem; }

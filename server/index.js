@@ -14,7 +14,9 @@ const io = new Server(server, {
 app.use(cors({ origin: "http://localhost:5173" }))
 app.use(express.json())
 
-mongoose.connect(process.env.MONGO_URI)
+MONGO_DB_URI = process.env.MONGO_URI || "mongodb://localhost:27017/notesapp"
+
+mongoose.connect(MONGO_DB_URI)
   .then(() => console.log("mongo connected"))
   .catch(err => console.error(err))
 
@@ -25,6 +27,7 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => console.log("client left:", socket.id))
 })
 
-server.listen(process.env.PORT, () => {
-  console.log(`server on ${process.env.PORT}`)
+PORT_NUMBER = process.env.PORT || 5000
+server.listen(PORT_NUMBER, () => {
+  console.log(`server on ${PORT_NUMBER}`)
 })
