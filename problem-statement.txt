@@ -1,0 +1,47 @@
+Build a real-time Notes application using MERN stack with Socket.IO.
+
+Requirements:
+
+Backend (Node.js + Express + MongoDB):
+
+1. Create APIs:
+
+   * POST /notes → create note
+   * GET /notes → fetch all notes (with optional search query)
+   * DELETE /notes/:id → delete note
+
+2. Add search functionality:
+
+   * GET /notes?search=keyword (use MongoDB regex)
+
+3. Integrate Socket.IO:
+
+   * When a note is created → broadcast to all clients
+   * When a note is deleted → broadcast to all clients
+
+Frontend (React):
+
+1. Create UI:
+
+   * Add note (title + content)
+   * List notes
+   * Delete note
+
+2. Search:
+
+   * Add search input
+   * Implement debounce (500ms delay)
+
+3. Real-time sync:
+
+   * When one user adds/deletes note → reflect instantly on other clients
+
+4. Handle:
+
+   * Loading states
+   * API errors
+
+Bonus:
+* Add validation (empty title/content)
+* Show timestamps
+* Use clean folder structure
