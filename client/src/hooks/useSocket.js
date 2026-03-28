@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react"
 import { io } from "socket.io-client"
 
-const socket = io("http://localhost:5000", { autoConnect: true })
+const BACKEND_BASE_URL = process.env.BACKEND_BASE_URL || "http://localhost:5000"
+const socket = io(BACKEND_BASE_URL, { autoConnect: true })
 
 export const useSocket = (event, handler) => {
   const savedHandler = useRef(handler)
